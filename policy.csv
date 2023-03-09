@@ -1,0 +1,26 @@
+#分割符逗号后面要有一个空格，否则无法验证
+
+#刷新token
+p, role:basic, domain1, /refresh_token, GET
+#代码生成
+p, admin, domain1, /a/gen, POST
+
+#user管理
+p, role:rbac, domain1, /a/sys/user/add, POST
+p, role:rbac, domain1, /a/sys/user/get, POST
+p, role:rbac, domain1, /a/sys/user/delete, POST
+p, role:rbac, domain1, /a/sys/user/update, POST
+p, role:rbac, domain1, /a/sys/user/list, POST
+p, role:rbac, domain1, /a/sys/user/page, POST
+
+#office管理
+p, role:rbac, domain1, /a/sys/office/add, POST
+p, role:rbac, domain1, /a/sys/office/get, POST
+p, role:rbac, domain1, /a/sys/office/delete, POST
+p, role:rbac, domain1, /a/sys/office/update, POST
+p, role:rbac, domain1, /a/sys/office/list, POST
+p, role:rbac, domain1, /a/sys/office/page, POST
+
+#角色分组控制
+g, zhangsan, role:basic, domain1
+g, zhangsan, role:rbac, domain1

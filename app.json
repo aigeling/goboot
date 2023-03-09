@@ -1,0 +1,27 @@
+{
+    "debug":true,
+    "defaultDB":"pg1",
+    "server":{
+        "port": 9900
+    },
+    "DBConfigs":{
+        "pg1": {
+            "dbType":"postgresql",
+            "host":"192.168.19.161",
+            "port":9999,
+            "dbName":"testdb",
+            "user":"postgres",
+            "password":"postgres123",
+            "enabled":true
+        },
+        "mysql1": {
+            "dbType":"mysql",
+            "host":"192.168.19.141",
+            "port":3306,
+            "dbName":"testdb",
+            "user":"root",
+            "password":"root123",
+            "enabled":false
+        }
+    }
+}

@@ -1,0 +1,7 @@
+/web
+/vendor
+/tmp
+/.vscode
+/air.conf
+/*.exe
+/*.log
