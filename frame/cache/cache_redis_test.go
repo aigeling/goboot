@@ -6,12 +6,21 @@ import (
 	"testing"
 )
 
-var client *RedisClient = NewRedisClient(&RedisConf{
-	Host:     "192.168.19.141",
-	Port:     6379,
-	Password: "123456",
-	DB:       0,
-})
+var client *RedisClient
+
+func init() {
+	var err error
+	client, err = NewRedisClient(&RedisConf{
+		Host:     "192.168.19.141",
+		Port:     6379,
+		Password: "123456",
+		DB:       0,
+	})
+	if err != nil {
+		fmt.Printf("conn redis err :%v", err)
+	}
+
+}
 
 func TestLPush(t *testing.T) {
 

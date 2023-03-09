@@ -18,16 +18,23 @@ type RedisConf struct {
 	DB       int    `json:"db"`
 }
 
-func NewRedisClient(conf *RedisConf) *RedisClient {
+// 创建redis客户端
+func NewRedisClient(conf *RedisConf) (*RedisClient, error) {
 	rd := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", conf.Host, conf.Port),
 		Password: conf.Password,
 		DB:       conf.DB, // 数据库
 	})
 
+	_, err := rd.Ping().Result()
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &RedisClient{
 		client: rd,
-	}
+	}, nil
 }
 
 func (o *RedisClient) LPush(key string, value ...any) error {
