@@ -3,6 +3,8 @@ module github.com/aigeling/goboot
 go 1.19
 
 require (
+	github.com/ZZMarquis/gm v1.3.2
+	github.com/andreburgaud/crypt2go v1.2.0
 	github.com/appleboy/gin-jwt/v2 v2.9.1
 	github.com/casbin/casbin/v2 v2.63.0
 	github.com/gin-contrib/cors v1.4.0
@@ -12,6 +14,8 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/mattn/go-colorable v0.1.13
 	github.com/natefinch/lumberjack v2.0.0+incompatible
+	github.com/sirupsen/logrus v1.9.0
+	github.com/spf13/cast v1.5.0
 	github.com/spf13/viper v1.15.0
 	github.com/tjfoc/gmsm v1.4.1
 	go.uber.org/zap v1.24.0
@@ -54,7 +58,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/quasoft/memstore v0.0.0-20191010062613-2bce066d2b0b // indirect
 	github.com/spf13/afero v1.9.3 // indirect
-	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect

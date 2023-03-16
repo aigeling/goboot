@@ -6,10 +6,12 @@ import (
 	"crypto/rand"
 	"errors"
 
+	"github.com/andreburgaud/crypt2go/ecb"
 	"github.com/tjfoc/gmsm/sm2"
 	"github.com/tjfoc/gmsm/sm3"
 	"github.com/tjfoc/gmsm/sm4"
 	"github.com/tjfoc/gmsm/x509"
+	//   "github.com/andreburgaud/crypt2go/padding"
 )
 
 //国密加解密
@@ -60,7 +62,7 @@ func (o *SM2) Encrypt(en []byte) (rst []byte, err error) {
 		return nil, errors.New("no public key")
 	}
 
-	rst, err = sm2.Encrypt(o.pubMen, en, nil, o.mode)
+	rst, err = sm2.Encrypt(o.pubMen, en, rand.Reader, o.mode)
 	return
 }
 
@@ -161,31 +163,48 @@ func Sm3Encode(enStr string) []byte {
 }
 
 type SM4 struct {
-	pwd          string //128位，16字节
-	iv           string
+	pwd          []byte //128位
 	block        cipher.Block
 	blockmode_en cipher.BlockMode
 	blockmode_de cipher.BlockMode
 }
 
-// 创建对称加密对象
+// 创建ECB模式SM4加密
 //
 // pwd: 密钥128位，16字节;
-// iv: 初始化向量,位数与密钥相同
-func NewSM4(pwd, iv string) (*SM4, error) {
+func NewECBSM4(pwd []byte) (*SM4, error) {
 
-	block, err := sm4.NewCipher([]byte(pwd))
+	block, err := sm4.NewCipher(pwd)
 	if err != nil {
 		return nil, err
 	}
 
-	ivBytes := []byte(iv)
-	blockmode_en := cipher.NewCBCEncrypter(block, ivBytes)
-	blockmode_de := cipher.NewCBCDecrypter(block, ivBytes)
+	blockmode_en := ecb.NewECBEncrypter(block)
+	blockmode_de := ecb.NewECBDecrypter(block)
 
 	return &SM4{
 		pwd:          pwd,
-		iv:           iv,
+		block:        block,
+		blockmode_en: blockmode_en,
+		blockmode_de: blockmode_de,
+	}, nil
+}
+
+// 创建CBC模式SM4加密
+//
+// pwd: 密钥128位，16字节;
+func NewCBCSM4(pwd, iv []byte) (*SM4, error) {
+
+	block, err := sm4.NewCipher(pwd)
+	if err != nil {
+		return nil, err
+	}
+
+	blockmode_en := cipher.NewCBCEncrypter(block, iv)
+	blockmode_de := cipher.NewCBCDecrypter(block, iv)
+
+	return &SM4{
+		pwd:          pwd,
 		block:        block,
 		blockmode_en: blockmode_en,
 		blockmode_de: blockmode_de,
@@ -194,7 +213,7 @@ func NewSM4(pwd, iv string) (*SM4, error) {
 
 // 加密
 func (o *SM4) Encrypt(src []byte) []byte {
-	src = paddingText(src, o.block.BlockSize())
+	src = pKCS5Padding(src, o.block.BlockSize())
 	// blockmode := cipher.NewCBCEncrypter(o.block, o.ivBytes)
 	dst := make([]byte, len(src))
 	o.blockmode_en.CryptBlocks(dst, src)
@@ -208,13 +227,13 @@ func (o *SM4) Decrypt(src []byte) []byte {
 	//解密
 	o.blockmode_de.CryptBlocks(dst, src)
 	//去除填充
-	dst = unPaddingText(dst)
+	dst = pKCS5UnPadding(dst)
 	return dst
 
 }
 
 // 给最后一组数据填充至blockSize字节
-func paddingText(src []byte, blockSize int) []byte {
+func pKCS5Padding(src []byte, blockSize int) []byte {
 
 	//求出最后一个分组需要填充的字节数
 	padding := blockSize - len(src)%blockSize
@@ -227,7 +246,7 @@ func paddingText(src []byte, blockSize int) []byte {
 }
 
 // 取出数据尾部填充的赘余字符
-func unPaddingText(src []byte) []byte {
+func pKCS5UnPadding(src []byte) []byte {
 	//获取待处理数据长度
 	len := len(src)
 	//取出最后一个字符
@@ -235,3 +254,16 @@ func unPaddingText(src []byte) []byte {
 	newText := src[:len-num]
 	return newText
 }
+
+/*
+func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
+    padding := blockSize - len(ciphertext) % blockSize
+    padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+    return append(ciphertext, padtext...)
+}
+
+func PKCS5UnPadding(origData []byte) []byte {
+    length := len(origData)
+    unpadding := int(origData[length - 1])
+    return origData[:(length - unpadding)]
+}*/
